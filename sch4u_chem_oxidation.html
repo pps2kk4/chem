@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCH4U Interactive Lesson — Redox Reactions</title>
+<style>
+:root {
+    --bg: #0b1020;
+    --panel: #141d33;
+    --panel2: #1b2946;
+    --ink: #f1f5ff;
+    --muted: #bdc8df;
+    --blue: #7dd3fc;
+    --green: #86efac;
+    --red: #fda4af;
+    --line: #394967;
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 18px 14px 88px;
+}
+header {
+    max-width: 1000px;
+    margin: 0 auto 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+.brand { color: var(--blue); font-weight: 800; letter-spacing: 0.1em; font-size: 0.75rem; }
+main { max-width: 1000px; margin: auto; }
+.slide {
+    display: none;
+    min-height: 70vh;
+    padding: clamp(22px, 4vw, 48px);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    background: linear-gradient(140deg, var(--panel), #10172a);
+    box-shadow: 0 16px 44px #0004;
+}
+.slide.active { display: block; }
+.k { color: var(--green); font-size: 0.78rem; letter-spacing: 0.12em; font-weight: 800; text-transform: uppercase; margin-bottom: 12px; }
+h1 { font-size: clamp(2.4rem, 6vw, 4.5rem); line-height: 1.02; letter-spacing: -0.04em; margin: 0.1em 0 0.35em; }
+h2 { font-size: clamp(1.7rem, 4vw, 2.6rem); line-height: 1.1; margin: 0.1em 0 0.55em; }
+h3 { margin: 0.2em 0 0.5em; }
+p, li { color: var(--muted); font-size: clamp(1rem, 1.7vw, 1.12rem); line-height: 1.65; }
+strong { color: var(--ink); }
+.lead { font-size: 1.25rem; max-width: 760px; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 18px 0; }
+.card { background: var(--panel2); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+.card p:last-child { margin-bottom: 0; }
+.eq {
+    background: #0a1326;
+    border: 1px solid #30405f;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 15px 0;
+    font: clamp(1.1rem, 2.5vw, 1.6rem)/1.65 "Cambria Math", "Times New Roman", serif;
+    overflow-wrap: anywhere;
+}
+.call {
+    border-left: 4px solid var(--blue);
+    background: #17243e;
+    padding: 13px 16px;
+    border-radius: 0 10px 10px 0;
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 16px 0;
+}
+.good { border-color: var(--green); }
+.warn { border-color: #fcd34d; }
+.tag {
+    display: inline-block;
+    padding: 7px 11px;
+    border: 1px solid var(--line);
+    border-radius: 99px;
+    margin: 4px 4px 4px 0;
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+table { width: 100%; border-collapse: collapse; margin: 14px 0; }
+td, th { text-align: left; padding: 10px; border-bottom: 1px solid var(--line); color: var(--muted); line-height: 1.5; }
+th { color: var(--ink); background: #1a2742; }
+.scroll { overflow: auto; }
+.steps { padding-left: 1.4em; }
+.steps li { padding: 0 0 7px; }
+.reveal {
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: #1a2947;
+    border: 1px solid #435879;
+    border-radius: 10px;
+    color: var(--blue);
+    font-weight: 700;
+    cursor: pointer;
+}
+.answer {
+    display: none;
+    background: #102b24;
+    border: 1px solid #376a56;
+    padding: 14px;
+    border-radius: 12px;
+    margin-top: 12px;
+    color: #d1fae5;
+    line-height: 1.6;
+}
+.answer.show { display: block; }
+.quiz { background: #111a2d; border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin: 14px 0; }
+.options { display: grid; gap: 8px; }
+.opt {
+    text-align: left;
+    padding: 11px 13px;
+    background: #1c2945;
+    color: var(--ink);
+    border: 1px solid #43516e;
+    border-radius: 9px;
+    cursor: pointer;
+}
+.opt.correct { background: #123727; border-color: var(--green); }
+.opt.incorrect { background: #3a1c2a; border-color: var(--red); }
+.feedback { min-height: 24px; font-weight: 700; }
+.feedback.ok { color: var(--green); }
+.feedback.no { color: var(--red); }
+.nav {
+    position: fixed;
+    z-index: 5;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 11px max(10px, calc((100vw - 1000px) / 2));
+    background: #090f20f5;
+    border-top: 1px solid var(--line);
+    backdrop-filter: blur(10px);
+}
+.nav button {
+    background: #1a2947;
+    border: 1px solid #43516e;
+    border-radius: 10px;
+    color: var(--ink);
+    padding: 11px 14px;
+    font-weight: 750;
+    cursor: pointer;
+}
+.nav .primary { background: var(--blue); color: #082035; border-color: var(--blue); }
+.nav button:disabled { opacity: 0.35; cursor: not-allowed; }
+#count { min-width: 65px; text-align: center; color: var(--muted); font-size: 0.9rem; }
+.bar { height: 5px; flex: 1; max-width: 440px; background: #26324d; border-radius: 99px; overflow: hidden; }
+.fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--blue), var(--green)); transition: width 0.3s ease; }
+@media(max-width: 650px) {
+    body { padding: 10px 8px 84px; }
+    header { font-size: 0.78rem; }
+    .slide { min-height: calc(100dvh - 112px); padding: 21px 16px; border-radius: 16px; }
+    .grid { grid-template-columns: 1fr; gap: 9px; }
+    .bar { display: none; }
+    .nav { gap: 5px; padding: 9px 7px; }
+    .nav button { padding: 10px; font-size: 0.88rem; }
+}
+</style>
+</head>
+<body>
+<header>
+    <div>
+        <div class="brand">SCH4U • CHEMISTRY</div>
+        <div>Redox Reactions</div>
+    </div>
+    <span class="tag">70–80 minutes</span>
+</header>
+
+<main>
+<section class="slide active">
+    <div class="k">Introduction · 1 min</div>
+    <h1>Balancing Redox Reactions</h1>
+    <p class="lead">The <strong>oxidation-number method</strong> in acidic and basic solutions.</p>
+    <div>
+        <span class="tag">Oxidation numbers</span>
+        <span class="tag">Acidic solution</span>
+        <span class="tag">Basic solution</span>
+        <span class="tag">Disproportionation</span>
+    </div>
+    <div class="eq">Oxidation = loss of electrons<br>Reduction = gain of electrons</div>
+    <p>Follow the slides in order. Attempt each practice section before revealing the solution.</p>
+</section>
+
+<section class="slide">
+    <div class="k">Learning Goals · 2 min</div>
+    <h2>Objectives</h2>
+    <ol class="steps">
+        <li>Assign oxidation numbers to elements in compounds and polyatomic ions.</li>
+        <li>Identify species undergoing oxidation and reduction.</li>
+        <li>Equalize total electron transfer using the oxidation-number method.</li>
+        <li>Balance reactions in acidic environments.</li>
+        <li>Convert acidic procedures to balance basic environments.</li>
+        <li>Apply the procedure to disproportionation reactions.</li>
+    </ol>
+    <div class="call">Ensure you verify both the atom count and the total charge when reviewing your final equation.</div>
+</section>
+
+<section class="slide">
+    <div class="k">Part 1 · 3 min</div>
+    <h2>Oxidation Numbers</h2>
+    <p>An oxidation number (ON) is a formal value used to track electron movement during a reaction.</p>
+    <div class="grid">
+        <div class="card">
+            <h3>Oxidation</h3>
+            <div class="eq">ON increases ↑</div>
+            <p>The species loses electrons.</p>
+        </div>
+        <div class="card">
+            <h3>Reduction</h3>
+            <div class="eq">ON decreases ↓</div>
+            <p>The species gains electrons.</p>
+        </div>
+    </div>
+    <div class="call good"><strong>OIL RIG:</strong> Oxidation Is Loss; Reduction Is Gain (of electrons).</div>
+</section>
+
+<section class="slide">
+    <div class="k">Part 1 · 3 min</div>
+    <h2>Oxidation-Number Rules</h2>
+    <ul>
+        <li>An uncombined element has ON = 0 (e.g., I₂, P₄, Fe).</li>
+        <li>A monatomic ion’s ON equals its charge (e.g., Fe²⁺ = +2).</li>
+        <li>Oxygen is generally −2 (except in peroxides where it is −1).</li>
+        <li>Hydrogen is generally +1 when bonded to nonmetals.</li>
+        <li>The sum of oxidation numbers equals the net charge.</li>
+    </ul>
+    <div class="eq">Neutral compound: sum = 0<br>Ion: sum = ion charge</div>
+</section>
+
+<section class="slide">
+    <div class="k">Part 1 · 2 min</div>
+    <h2>Calculation Example: MnO₄⁻</h2>
+    <p>Let Mn = x. Each oxygen is −2. The net charge of the ion is −1.</p>
+    <div class="eq">
+        x + 4(−2) = −1<br>
+        x − 8 = −1<br>
+        <strong>x = +7</strong>
+    </div>
+    <button class="reveal" data-id="whycharge">Why does the sum equal −1?</button>
+    <div class="answer" id="whycharge">MnO₄⁻ is a polyatomic ion with an overall charge of −1. Therefore, the algebraic sum of the individual oxidation numbers must equal −1, not 0.</div>
+</section>
+
+<section class="slide">
+    <div class="k">Knowledge Check · 2 min</div>
+    <h2>Oxidation Numbers</h2>
+    <div class="quiz" data-done="0">
+        <p><strong>Question 1.</strong> What is the oxidation number of Cr in Cr₂O₇²⁻?</p>
+        <div class="options">
+            <button class="opt" data-c="0">+12</button>
+            <button class="opt" data-c="1">+6</button>
+            <button class="opt" data-c="0">+7</button>
+            <button class="opt" data-c="0">+14</button>
+        </div>
+        <p class="feedback" aria-live="polite"></p>
+    </div>
+    <div class="call">Setup: 2x + 7(−2) = −2. Solve for x.</div>
+</section>
+
+<section class="slide">
+    <div class="k">Part 2 · 3 min</div>
+    <h2>The Oxidation-Number Method</h2>
+    <ol class="steps">
+        <li>Assign oxidation numbers to all atoms.</li>
+        <li>Identify which ONs increase and decrease.</li>
+        <li>Calculate the <strong>total</strong> electron change per molecule/ion.</li>
+        <li>Determine coefficients to equalize electrons lost and gained.</li>
+        <li>Balance remaining atoms (O with H₂O, H with H⁺).</li>
+        <li>Convert to basic conditions if required.</li>
+    </ol>
+    <div class="call warn">Multiply the ON change per atom by the number of those atoms present in the formula.</div>
+</section>
+
+<section class="slide">
+    <div class="k">Part 2 · 3 min</div>
+    <h2>Equalizing Electron Transfer</h2>
+    <p>Assume atom A's ON increases by 3 (loses 3 e⁻) and atom B's ON decreases by 2 (gains 2 e⁻).</p>
+    <div class="eq">
+        2 × 3 = 6 electrons lost<br>
+        3 × 2 = 6 electrons gained
+    </div>
+    <p>The lowest common multiple is 6. You require 2 atoms of A for every 3 atoms of B to conserve charge.</p>
+</section>
+
+<section class="slide">
+    <div class="k">Part 3 · 2 min</div>
+    <h2>Acidic Solution Procedure</h2>
+    <p>Balance the following reaction in an <strong>acidic solution</strong>:</p>
+    <div class="eq">MnO₄⁻ + CH₃OH → MnO₂ + CO₂</div>
+    <p>First, identify the oxidation numbers that change.</p>
+    <button class="reveal" data-id="acidchanges">Show oxidation numbers</button>
+    <div class="answer" id="acidchanges">
+        Mn: +7 in MnO₄⁻ → +4 in MnO₂ (Reduced, gains 3 e⁻).<br>
+        C: −2 in CH₃OH → +4 in CO₂ (Oxidized, loses 6 e⁻).
+    </div>
+</section>
+
+<section class="slide">
+    <div class="k">Part 3 · 3 min</div>
+    <h2>Step 1: Set the Redox Coefficients</h2>
+    <div class="grid">
+        <div class="card">
+            <h3>Manganese</h3>
+            <div class="eq">+7 → +4</div>
+            <p>Gains 3 e⁻ per Mn.</p>
+        </div>
+        <div class="card">
+            <h3>Carbon</h3>
+            <div class="eq">−2 → +4</div>
+            <p>Loses 6 e⁻ per C.</p>
+        </div>
+    </div>
+    <p>To equalize the electron transfer (6 e⁻), two Mn atoms are required for every one C atom.</p>
+    <div class="eq">2MnO₄⁻ + 1CH₃OH → 2MnO₂ + 1CO₂</div>
+</section>
+
+<section class="slide">
+    <div class="k">Part 3 · 3 min</div>
+    <h2>Step 2: Balance Oxygen</h2>
+    <div class="eq">2MnO₄⁻ + CH₃OH → 2MnO₂ + CO₂</div>
+    <table aria-label="Oxygen count">
+        <tr><th>Side</th><th>Oxygen Count</th></tr>
+        <tr><td>Left</td><td>8 (from 2MnO₄⁻) + 1 (from CH₃OH) = 9</td></tr>
+        <tr><td>Right</td><td>4 (from 2MnO₂) + 2 (from CO₂) = 6</td></tr>
+    </table>
+    <p>The right side is deficient by 3 oxygen atoms. Add <strong>3H₂O to the right side</strong>.</p>
+    <div class="eq">2MnO₄⁻ + CH₃OH → 2MnO₂ + CO₂ + 3H₂O</div>
+</section>
+
+<section class="slide">
+    <div class="k">Part 3 · 3 min</div>
+    <h2>Step 3: Balance Hydrogen</h2>
+    <div class="eq">2MnO₄⁻ + CH₃OH → 2MnO₂ + CO₂ + 3H₂O</div>
+    <p>Count the hydrogen atoms:</p>
+    <ul>
+        <li>Left side: 4 H (from CH₃OH)</li>
+        <li>Right side: 6 H (from 3H₂O)</li>
+    </ul>
+    <p>The left side requires 2 more hydrogen atoms. Add <strong>2H⁺ to the left side</strong>.</p>
+    <div class="eq">2MnO₄⁻ + CH₃OH + 2H⁺ → 2MnO₂ + CO₂ + 3H₂O</div>
+</section>
+
+<section class="slide">
+    <div class="k">Part 3 · 2 min</div>
+    <h2>Acidic Solution: Final Verification</h2>
+    <div class="eq">2MnO₄⁻ + CH₃OH + 2H⁺ → 2MnO₂ + CO₂ + 3H₂O</div>
+    <table aria-label="Final check">
+        <tr><th>Metric</th><th>Left Side</th><th>Right Side</th></tr>
+        <tr><td>Mn Atoms</td><td>2</td><td>2</td></tr>
+        <tr><td>C Atoms</td><td>1</td><td>1</td></tr>
+        <tr><td>Charge</td><td>2(−1) + 2(+1) = 0</td><td>0</td></tr>
+    </table>
+    <div class="call good">The atom counts are equal and the total charge is balanced. The procedure is complete.</div>
+</section>
+
+<section class="slide">
+    <div class="k">Part 4 · 2 min</div>
+    <h2>Basic Solution Procedure</h2>
+    <p>For basic solutions, balance the reaction as if it were acidic first.</p>
+    <p>Then, perform the following conversion:</p>
+    <ol class="steps">
+        <li>Add OH⁻ to both sides equal to the number of H⁺ ions.</li>
+        <li>Combine H⁺ and OH⁻ on the same side to form H₂O.</li>
+        <li>Cancel out redundant H₂O molecules that appear on both sides.</li>
+    </ol>
+    <div class="call warn">H⁺ ions cannot remain in the final equation for a basic solution.</div>
+</section>
+
+<section class="slide">
+    <div class="k">Part 4 · 3 min</div>
+    <h2>Basic Solution: Step 1</h2>
+    <p>Balance the following in a <strong>basic solution</strong>:</p>
+    <div class="eq">I⁻ + MnO₄⁻ → I₂ + MnO₂</div>
+    <p>Determine the electron transfer:</p>
+    <ul>
+        <li>I: −1 → 0. Two I⁻ are required to make I₂, losing a total of 2 e⁻.</li>
+        <li>Mn: +7 → +4. Gains 3 e⁻.</li>
+    </ul>
+    <p>LCM of 2 and 3 is 6. We require 3 molecules of I₂ (6 e⁻ lost) and 2 of Mn (6 e⁻ gained).</p>
+    <div class="eq">6I⁻ + 2MnO₄⁻ → 3I₂ + 2MnO₂</div>
+</section>
+
+<section class="slide">
+    <div class="k">Part 4 · 3 min</div>
+    <h2>Basic Solution: Step 2</h2>
+    <div class="eq">6I⁻ + 2MnO₄⁻ → 3I₂ + 2MnO₂</div>
+    <p>Balance O and H as if the solution were acidic:</p>
+    <p>Left side has 8 O. Right side has 4 O. Add <strong>4H₂O to the right</strong>.</p>
+    <div class="eq">6I⁻ + 2MnO₄⁻ → 3I₂ + 2MnO₂ + 4H₂O</div>
+    <p>Right side has 8 H. Left side has 0 H. Add <strong>8H⁺ to the left</strong>.</p>
+    <div class="eq">6I⁻ + 2MnO₄⁻ + 8H⁺ → 3I₂ + 2MnO₂ + 4H₂O</div>
+</section>
+
+<section class="slide">
+    <div class="k">Part 4 · 4 min</div>
+    <h2>Basic Solution: Conversion</h2>
+    <p>Currently: <span class="math">6I⁻ + 2MnO₄⁻ + 8H⁺ → 3I₂ + 2MnO₂ + 4H₂O</span></p>
+    <p>Add <strong>8OH⁻ to both sides</strong> to neutralize the H⁺.</p>
+    <div class="eq">6I⁻ + 2MnO₄⁻ + (8H⁺ + 8OH⁻) <br>→ 3I₂ + 2MnO₂ + 4H₂O + 8OH⁻</div>
+    <p>Combine H⁺ and OH⁻ into water.</p>
+    <div class="eq">6I⁻ + 2MnO₄⁻ + 8H₂O <br>→ 3I₂ + 2MnO₂ + 4H₂O + 8OH⁻</div>
+    <p>Cancel 4H₂O from both sides.</p>
+    <div class="eq">6I⁻ + 2MnO₄⁻ + 4H₂O <br>→ 3I₂ + 2MnO₂ + 8OH⁻</div>
+</section>
+
+<section class="slide">
+    <div class="k">Part 5 · 3 min</div>
+    <h2>Disproportionation Reactions</h2>
+    <p>In a disproportionation reaction, a single reactant acts as both the oxidizing and reducing agent.</p>
+    <div class="eq">P₄ → PH₃ + H₂PO₂⁻ (Basic solution)</div>
+    <p>Assign oxidation numbers to Phosphorus:</p>
+    <ul>
+        <li>In P₄: ON = 0</li>
+        <li>In PH₃: ON = −3 (Gains 3 e⁻ per P)</li>
+        <li>In H₂PO₂⁻: ON = +1 (Loses 1 e⁻ per P)</li>
+    </ul>
+    <p>Notice the ratio: 1 P atom is reduced for every 3 P atoms that are oxidized.</p>
+</section>
+
+<section class="slide">
+    <div class="k">Part 5 · 3 min</div>
+    <h2>Disproportionation: Redox Ratio</h2>
+    <p>Ratio: 1 P atom (gains 3 e⁻) : 3 P atoms (lose 1 e⁻ each).</p>
+    <p>This equals exactly 4 P atoms, which corresponds to one molecule of P₄.</p>
+    <p>Therefore, one P₄ molecule produces one PH₃ and three H₂PO₂⁻.</p>
+    <div class="eq">1P₄ → 1PH₃ + 3H₂PO₂⁻</div>
+    <p>Next, balance the O and H as if in acidic solution.</p>
+    <button class="reveal" data-id="disacidic">Show acidic balancing step</button>
+    <div class="answer" id="disacidic">Right side has 6 O. Add 6H₂O to left.<br>P₄ + 6H₂O → PH₃ + 3H₂PO₂⁻<br>Left side has 12 H. Right side has 3 + 6 = 9 H. Add 3H⁺ to the right.<br>P₄ + 6H₂O → PH₃ + 3H₂PO₂⁻ + 3H⁺</div>
+</section>
+
+<section class="slide">
+    <div class="k">Part 5 · 2 min</div>
+    <h2>Disproportionation: Convert to Basic</h2>
+    <p>Acidic state: <span class="math">P₄ + 6H₂O → PH₃ + 3H₂PO₂⁻ + 3H⁺</span></p>
+    <p>Add 3OH⁻ to both sides.</p>
+    <div class="eq">P₄ + 6H₂O + 3OH⁻ → PH₃ + 3H₂PO₂⁻ + 3H₂O</div>
+    <p>Simplify the H₂O.</p>
+    <div class="eq">P₄ + 3H₂O + 3OH⁻ → PH₃ + 3H₂PO₂⁻</div>
+    <div class="call good">Check charge: Left = −3. Right = 3(−1) = −3. Balanced.</div>
+</section>
+
+<section class="slide">
+    <div class="k">Review · 2 min</div>
+    <h2>Procedural Errors to Avoid</h2>
+    <ul>
+        <li><strong>Failing to account for subscripts:</strong> When calculating total electron transfer, the ON change must be multiplied by the number of atoms undergoing the change in the formula.</li>
+        <li><strong>Balancing O and H prematurely:</strong> The primary redox coefficients must be locked in before adding water or hydrogen ions.</li>
+        <li><strong>Incomplete basic conversion:</strong> Leaving H⁺ in the final equation or forgetting to add OH⁻ to the side opposite the H⁺.</li>
+        <li><strong>Skipping the charge check:</strong> The most reliable way to catch an error is verifying that the sum of charges on the left equals the sum on the right.</li>
+    </ul>
+</section>
+
+<section class="slide">
+    <div class="k">Knowledge Check · 2 min</div>
+    <h2>Check Your Understanding</h2>
+    <div class="quiz" data-done="0">
+        <p><strong>Question 2.</strong> In a basic solution, you find 6H⁺ on the left side of your equation. How do you proceed?</p>
+        <div class="options">
+            <button class="opt" data-c="0">Add 6H₂O to the left side.</button>
+            <button class="opt" data-c="1">Add 6OH⁻ to both the left and right sides.</button>
+            <button class="opt" data-c="0">Add 6OH⁻ only to the left side.</button>
+        </div>
+        <p class="feedback" aria-live="polite"></p>
+    </div>
+</section>
+
+<section class="slide">
+    <div class="k">Knowledge Check · 2 min</div>
+    <h2>Check Your Understanding</h2>
+    <div class="quiz" data-done="0">
+        <p><strong>Question 3.</strong> In the disproportionation of P₄, why do we use a 1:3 ratio for the products?</p>
+        <div class="options">
+            <button class="opt" data-c="0">To ensure there are 4 phosphorus atoms on the right side.</button>
+            <button class="opt" data-c="1">Because P gains 3e⁻ during reduction and loses 1e⁻ during oxidation. Three oxidations equal one reduction.</button>
+            <button class="opt" data-c="0">Because the molecule is P₄ and must be divided by 4.</button>
+        </div>
+        <p class="feedback" aria-live="polite"></p>
+    </div>
+</section>
+
+<section class="slide">
+    <div class="k">Practice · 4 min</div>
+    <h2>Practice A — Identifying Roles</h2>
+    <p>Consider the reaction:</p>
+    <div class="eq">Fe²⁺ + Ce⁴⁺ → Fe³⁺ + Ce³⁺</div>
+    <p>Identify the species oxidized, the species reduced, the oxidizing agent, and the reducing agent.</p>
+    <button class="reveal" data-id="pa">Reveal Answers</button>
+    <div class="answer" id="pa">
+        <strong>Oxidized:</strong> Fe²⁺ → Fe³⁺ (loses an electron, ON increases).<br>
+        <strong>Reduced:</strong> Ce⁴⁺ → Ce³⁺ (gains an electron, ON decreases).<br>
+        <strong>Oxidizing agent:</strong> Ce⁴⁺ (it causes oxidation by undergoing reduction).<br>
+        <strong>Reducing agent:</strong> Fe²⁺ (it causes reduction by undergoing oxidation).
+    </div>
+</section>
+
+<section class="slide">
+    <div class="k">Practice · 5 min</div>
+    <h2>Practice B — Acidic Solution</h2>
+    <p>Balance the following in acidic solution:</p>
+    <div class="eq">Cr₂O₇²⁻ + Fe²⁺ → Cr³⁺ + Fe³⁺</div>
+    <p>Guidance: Cr changes from +6 to +3. Notice there are 2 Cr atoms in the dichromate ion. Fe changes from +2 to +3.</p>
+    <button class="reveal" data-id="pb">Reveal Balanced Equation</button>
+    <div class="answer" id="pb">
+        <div class="eq">Cr₂O₇²⁻ + 14H⁺ + 6Fe²⁺ → 2Cr³⁺ + 7H₂O + 6Fe³⁺</div>
+        Explanation: Two Cr atoms gain a total of 6 electrons. Therefore, 6 Fe²⁺ ions are required to provide 6 electrons.
+    </div>
+</section>
+
+<section class="slide">
+    <div class="k">Practice · 5 min</div>
+    <h2>Practice C — Basic Solution</h2>
+    <p>Balance this half-reaction in a basic solution:</p>
+    <div class="eq">Cl⁻ → ClO₃⁻</div>
+    <p>Balance O with H₂O, H with H⁺, convert using OH⁻, and add electrons to balance the charge.</p>
+    <button class="reveal" data-id="pc">Reveal Balanced Half-Reaction</button>
+    <div class="answer" id="pc">
+        <div class="eq">Cl⁻ + 6OH⁻ → ClO₃⁻ + 3H₂O + 6e⁻</div>
+        Explanation: Cl changes from −1 to +5, an oxidation producing 6e⁻ on the product side. Charge on left: −7. Charge on right: −1 + −6 = −7.
+    </div>
+</section>
+
+<section class="slide">
+    <div class="k">Summary · 2 min</div>
+    <h2>Procedure Checklist</h2>
+    <ol class="steps">
+        <li>Assigned oxidation numbers to all elements.</li>
+        <li>Identified ON changes and total electron transfer per formula unit.</li>
+        <li>Determined lowest common multiple to set the primary redox coefficients.</li>
+        <li>Balanced O with H₂O and H with H⁺.</li>
+        <li>If basic, neutralized H⁺ by adding OH⁻ to both sides and simplifying H₂O.</li>
+        <li>Verified that both atom count and total charge are equal on both sides.</li>
+    </ol>
+    <div class="call">If the final check fails, locate the step where the imbalance occurred rather than arbitrarily adjusting coefficients.</div>
+</section>
+
+<section class="slide">
+    <div class="k">Reference · 1 min</div>
+    <h2>References</h2>
+    <ul>
+        <li>SCH4U Ontario Curriculum Standards: Oxidation-Reduction Reactions.</li>
+        <li>Chalmers, M. <em>SCH4U Balancing Redox Reactions Using the Oxidation Number Method Example</em> [Video reference].</li>
+    </ul>
+    <p><strong>Lesson Complete.</strong></p>
+</section>
+</main>
+
+<nav class="nav">
+    <button id="prev" disabled>← Previous</button>
+    <span id="count">1 / 18</span>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <button id="next" class="primary">Next →</button>
+</nav>
+
+<script>
+(()=>{
+    const slides = [...document.querySelectorAll('.slide')];
+    const prev = document.querySelector('#prev');
+    const next = document.querySelector('#next');
+    const count = document.querySelector('#count');
+    const fill = document.querySelector('#fill');
+    let n = 0;
+
+    function show(i) {
+        n = Math.max(0, Math.min(slides.length - 1, i));
+        slides.forEach((s, j) => {
+            s.classList.toggle('active', j === n);
+            s.setAttribute('aria-hidden', j === n ? 'false' : 'true');
+        });
+        prev.disabled = n === 0;
+        next.textContent = n === slides.length - 1 ? 'Start again ↻' : 'Next →';
+        count.textContent = `${n + 1} / ${slides.length}`;
+        fill.style.width = `${(n + 1) / slides.length * 100}%`;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    prev.onclick = () => show(n - 1);
+    next.onclick = () => show(n === slides.length - 1 ? 0 : n + 1);
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown') show(n + 1);
+        if (e.key === 'ArrowLeft' || e.key === 'PageUp') show(n - 1);
+    });
+
+    const originals = new Map();
+    document.querySelectorAll('.reveal').forEach(b => {
+        originals.set(b, b.textContent);
+        b.onclick = () => {
+            const a = document.getElementById(b.dataset.id);
+            const open = a.classList.toggle('show');
+            b.textContent = open ? 'Hide answer' : originals.get(b);
+        };
+    });
+
+    document.querySelectorAll('.quiz').forEach(q => {
+        const f = q.querySelector('.feedback');
+        q.querySelectorAll('.opt').forEach(b => {
+            b.onclick = () => {
+                if (q.dataset.done === '1') return;
+                const ok = b.dataset.c === '1';
+                b.classList.add(ok ? 'correct' : 'incorrect');
+                if (ok) {
+                    q.dataset.done = '1';
+                    f.textContent = 'Correct.';
+                    f.className = 'feedback ok';
+                    q.querySelectorAll('.opt').forEach(o => {
+                        o.disabled = true;
+                        if (o.dataset.c === '1') o.classList.add('correct');
+                    });
+                } else {
+                    b.disabled = true;
+                    f.textContent = 'Incorrect. Please review the rule and try again.';
+                    f.className = 'feedback no';
+                }
+            };
+        });
+    });
+
+    show(0);
+})();
+</script>
+</body>
+</html>
